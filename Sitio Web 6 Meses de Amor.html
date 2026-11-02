@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi vida | 6 Meses de Amor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        parchment: '#FDFBF7',
+                        'parchment-dark': '#F4EFE6',
+                        burgundy: '#6B1D2F',
+                        'burgundy-dark': '#4A121E',
+                        'dusty-rose': '#D8A47F',
+                        'gold-accent': '#D4AF37',
+                        'gold-hover': '#AA820A',
+                        espresso: '#2C1810',
+                    },
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'serif'],
+                        heading: ['Playfair Display', 'serif'],
+                        script: ['Alex Brush', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Vintage Aesthetics */
+        body {
+            background-color: #FDFBF7;
+            color: #2C1810;
+            font-family: 'Cormorant Garamond', serif;
+            overflow-x: hidden;
+            background-image: radial-gradient(#d8a47f33 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        /* Paper textures & borders */
+        .vintage-border {
+            border: 2px solid #D4AF37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15), inset 0 0 20px rgba(107, 29, 47, 0.05);
+        }
+
+        .parchment-card {
+            background: linear-gradient(135deg, #FDFBF7 0%, #F5EBE1 100%);
+            border: 1px solid #E2D1C3;
+            box-shadow: 0 10px 30px -5px rgba(44, 24, 16, 0.1);
+        }
+
+        /* Custom Vinyl Rotation Animation */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+        .paused {
+            animation-play-state: paused;
+        }
+
+        /* Wax Seal Style */
+        .wax-seal {
+            background: radial-gradient(circle at 35% 35%, #9E2A3B, #5A121F);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Gold Foil Effect */
+        .gold-text {
+            background: linear-gradient(45deg, #B8860B, #FFD700, #DAA520, #B8860B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Canvas Overlay */
+        #petals-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDFBF7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D8A47F;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B1D2F;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Canvas para Corazones Rojos y Brillitos -->
+    <canvas id="petals-canvas"></canvas>
+
+    <!-- Elemento de Audio HTML5 oculto para reproducir la canción -->
+    <audio id="bg-audio" loop preload="auto">
+        <!-- URL por defecto de la canción. Puedes cambiar la URL o cargar tu propio archivo de audio usando el botón del reproductor -->
+        <source src="https://ia801503.us.archive.org/15/items/mon-laferte-my-one-and-only-love/Mon%20Laferte%20-%20My%20One%20and%20Only%20Love.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Reproductor de Música Flotante (Estilo Vinilo Vintage con Soporte para Audio) -->
+    <div class="fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-parchment/90 backdrop-blur-md p-2 pr-4 rounded-full border border-gold-accent shadow-xl">
+        <button id="music-toggle" class="relative group focus:outline-none" title="Reproducción de Música">
+            <div id="vinyl-record" class="w-12 h-12 rounded-full bg-neutral-900 border-2 border-gold-accent flex items-center justify-center animate-spin-slow paused shadow-md">
+                <div class="w-4 h-4 rounded-full bg-burgundy border border-gold-accent flex items-center justify-center">
+                    <div class="w-1.5 h-1.5 rounded-full bg-gold-accent"></div>
+                </div>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-full">
+                <i id="music-icon-hover" class="fas fa-play"></i>
+            </div>
+        </button>
+        <div class="text-xs pr-2">
+            <p class="font-bold text-burgundy tracking-wide">My One and Only Love</p>
+            <p id="music-status" class="text-espresso/70 italic">Mon Laferte • Click para reproducir</p>
+        </div>
+        <!-- Opción para subir audio propio si se desea reproducir desde archivo local -->
+        <label for="audio-file-input" class="cursor-pointer text-xs bg-burgundy/10 hover:bg-burgundy hover:text-parchment text-burgundy p-2 rounded-full border border-gold-accent/40 transition" title="Cargar canción desde tu dispositivo">
+            <i class="fas fa-upload"></i>
+        </label>
+        <input type="file" id="audio-file-input" accept="audio/*" class="hidden">
+    </div>
+
+    <!-- Navegación Encabezado -->
+    <nav class="sticky top-0 z-40 bg-parchment/80 backdrop-blur-md border-b border-gold-accent/30 py-3 px-4">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <a href="#" class="font-script text-3xl md:text-4xl text-burgundy font-bold hover:text-gold-accent transition">Mi vida</a>
+            <div class="hidden md:flex gap-6 text-base font-semibold text-espresso">
+                <a href="#carta" class="hover:text-burgundy transition">La Carta</a>
+                <a href="#linea-tiempo" class="hover:text-burgundy transition">Línea del Tiempo</a>
+                <a href="#razones" class="hover:text-burgundy transition">6 Razones</a>
+                <a href="#cartitas" class="hover:text-burgundy transition">Las 6 Cartitas</a>
+                <a href="#sorpresa" class="hover:text-burgundy transition">Sorpresa</a>
+            </div>
+            <button onclick="document.getElementById('carta').scrollIntoView({behavior: 'smooth'})" class="text-xs md:text-sm bg-burgundy text-parchment px-4 py-2 rounded-full border border-gold-accent hover:bg-burgundy-dark transition">
+                <i class="fas fa-heart text-rose-300 mr-1"></i> 6 Meses
+            </button>
+        </div>
+    </nav>
+
+    <!-- Header / Hero Section -->
+    <header class="min-h-[85vh] flex flex-col justify-center items-center text-center px-4 relative py-12">
+        <div class="absolute inset-0 max-w-4xl mx-auto opacity-10 pointer-events-none flex items-center justify-center">
+            <i class="fas fa-heart text-[250px] text-burgundy"></i>
+        </div>
+
+        <div class="z-10 max-w-3xl space-y-6">
+            <div class="inline-block px-4 py-1 rounded-full border border-gold-accent/60 bg-burgundy/5 text-burgundy font-serif italic text-sm md:text-base">
+                ✦ 4 de Mayo - 4 de Noviembre ✦
+            </div>
+
+            <h1 class="font-script text-6xl md:text-8xl text-burgundy font-bold drop-shadow-sm">
+                Mi vida
+            </h1>
+
+            <p class="font-heading text-2xl md:text-4xl text-espresso italic tracking-wide">
+                Nuestra historia de amor escrita en seis hermosos meses
+            </p>
+
+            <div class="flex justify-center items-center gap-4 py-4">
+                <div class="h-px bg-gold-accent w-16"></div>
+                <div class="wax-seal w-10 h-10 rounded-full flex items-center justify-center text-parchment font-script text-xl font-bold border border-gold-accent">
+                    6
+                </div>
+                <div class="h-px bg-gold-accent w-16"></div>
+            </div>
+
+            <!-- Contador de Tiempo / Tarjetas de Resumen -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 max-w-2xl mx-auto">
+                <div class="parchment-card p-4 rounded-lg border border-gold-accent/40 text-center">
+                    <span class="block font-heading text-3xl font-bold text-burgundy">6</span>
+                    <span class="text-xs uppercase tracking-widest text-espresso/70">Meses Juntas</span>
+                </div>
+                <div class="parchment-card p-4 rounded-lg border border-gold-accent/40 text-center">
+                    <span class="block font-heading text-3xl font-bold text-burgundy">184</span>
+                    <span class="text-xs uppercase tracking-widest text-espresso/70">Días de Amor</span>
+                </div>
+                <div class="parchment-card p-4 rounded-lg border border-gold-accent/40 text-center">
+                    <span class="block font-heading text-3xl font-bold text-burgundy">∞</span>
+                    <span class="text-xs uppercase tracking-widest text-espresso/70">Risas & Recuerdos</span>
+                </div>
+                <div class="parchment-card p-4 rounded-lg border border-gold-accent/40 text-center">
+                    <span class="block font-heading text-3xl font-bold text-burgundy">1</span>
+                    <span class="text-xs uppercase tracking-widest text-espresso/70">Futuro Juntas</span>
+                </div>
+            </div>
+
+            <div class="pt-8">
+                <a href="#carta" class="inline-flex items-center gap-2 bg-burgundy text-parchment px-8 py-3 rounded-full border-2 border-gold-accent font-heading tracking-wider hover:bg-burgundy-dark transition transform hover:-translate-y-1 shadow-lg">
+                    <span>Leer nuestra carta</span>
+                    <i class="fas fa-[#e0a96d] fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECCIÓN 1: LA CARTA PRINCIPAL -->
+    <section id="carta" class="py-20 px-4 max-w-4xl mx-auto relative">
+        <div class="text-center mb-12">
+            <h2 class="font-heading text-4xl md:text-5xl text-burgundy font-bold">La Carta Principal</h2>
+            <p class="font-serif italic text-xl text-espresso/80 mt-2">Haz clic en el sobre para desplegar mis sentimientos</p>
+            <div class="w-24 h-0.5 bg-gold-accent mx-auto mt-4"></div>
+        </div>
+
+        <!-- Sobre Interactivo -->
+        <div class="relative min-h-[500px] flex justify-center items-center">
+            <!-- Vista del Sobre Cerrado -->
+            <div id="envelope-closed" onclick="openMainLetter()" class="cursor-pointer group relative w-full max-w-lg parchment-card p-8 rounded-lg border-2 border-gold-accent shadow-2xl transition transform group-hover:scale-105 text-center flex flex-col items-center justify-center min-h-[320px]">
+                <div class="absolute inset-2 border border-dashed border-gold-accent/40 rounded pointer-events-none"></div>
+                
+                <!-- Sello de Cera -->
+                <div class="wax-seal w-20 h-20 rounded-full flex items-center justify-center text-parchment font-script text-3xl font-bold border-2 border-gold-accent shadow-xl mb-4 group-hover:scale-110 transition">
+                    <i class="fas fa-heart text-gold-accent"></i>
+                </div>
+                
+                <h3 class="font-script text-4xl text-burgundy font-bold mb-2">Para ti, mi amor</h3>
+                <p class="font-serif italic text-lg text-espresso/70">Haz clic aquí para romper el sello y leer la carta</p>
+                <div class="mt-4 text-gold-accent text-sm flex items-center gap-1">
+                    <i class="fas fa-sparkles"></i> <span>Escrito desde el corazón</span>
+                </div>
+            </div>
+
+            <!-- Carta Abierta (Oculta por defecto) -->
+            <div id="letter-open" class="hidden w-full parchment-card p-8 md:p-12 rounded-lg vintage-border relative shadow-2xl transition-all duration-700">
+                <button onclick="closeMainLetter()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-burgundy/10 text-burgundy hover:bg-burgundy hover:text-parchment transition flex items-center justify-center" title="Cerrar carta">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <div class="border-b border-gold-accent/40 pb-6 mb-8 text-center">
+                    <span class="font-script text-3xl text-gold-accent font-bold">Querida mi vida,</span>
+                    <h3 class="font-heading text-2xl text-burgundy font-semibold mt-1">Nuestra Historia Interminable</h3>
+                </div>
+
+                <div class="space-y-6 text-lg md:text-xl text-espresso leading-relaxed font-serif text-justify">
+                    <p>
+                        Amor, todavía recuerdo aquel domingo 7 de diciembre como si hubiese sido ayer. Recuerdo ese primer «hola», cada detalle de aquel día y lo que nunca imaginé que llegaría a significar para mí. Sin duda, uno de los días más bonitos de mi vida. No me arrepiento ni un poquito de haber respondido a aquel comentario.
+                    </p>
+                    <p>
+                        Aunque no te voy a mentir, al principio no tenía mucha fe en que nuestra amistad durara. Mis amistades por redes sociales solían durar apenas unas semanas; después, la otra persona dejaba de hablarme o simplemente perdíamos el contacto. Pensé que contigo sería igual, así que no quería encariñarme demasiado, porque sabía que, si eso llegaba a pasar y te ibas, me dolería muchísimo.
+                    </p>
+                    <p>
+                        Pero ¿sabés qué? El destino tenía otros plans para nosotras. A medida que fui conociéndote, me di cuenta de la gran chica que eras y de lo especial que te estabas volviendo para mí. Poco a poco, llegaste a convertirte en esa persona con la que alguna vez había soñado.
+                    </p>
+                    <p>
+                        Y entonces llegó el 3 de mayo. Ese día reuní el valor suficiente para decirte lo que había empezado a sentir por vos. No te imaginás lo feliz que me hizo saber que sentías lo mismo. Sin embargo, me dijiste que necesitábamos tiempo, y lo entendí. En ese momento pensé: «Al menos lo intenté». Creí que las cosas se quedarían así, que seguiríamos siendo amigas y que quizá aquello que sentíamos nunca llegaría a convertirse en algo más.
+                    </p>
+                    <p>
+                        Pero no sabés lo que me hiciste sentir aquel 4 de mayo, cuando leí tu carta. Fue uno de esos momentos que quisiera guardar para siempre. Después de tanto imaginarlo, por fin podía decirlo: «Ella ahora es mi novia».
+                    </p>
+                    <p class="font-semibold text-burgundy italic">
+                        Y si pudiera volver a aquel domingo 7 de diciembre, volvería a responder ese comentario una y mil veces más, porque, sin saberlo, estaba dando el primer paso hacia una de las personas más importantes de mi vida: vos.
+                    </p>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gold-accent/40 text-right">
+                    <p class="font-script text-3xl text-burgundy font-bold">Por siempre tuya,</p>
+                    <p class="font-serif italic text-espresso">Tu novia que te ama</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: LÍNEA DEL TIEMPO -->
+    <section id="linea-tiempo" class="py-20 px-4 bg-parchment-dark/60 border-y border-gold-accent/30 relative">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-heading text-4xl md:text-5xl text-burgundy font-bold">Nuestra Línea del Tiempo</h2>
+                <p class="font-serif italic text-xl text-espresso/80 mt-2">Cada hito marcado a fuego en mi corazón</p>
+                <div class="w-24 h-0.5 bg-gold-accent mx-auto mt-4"></div>
+            </div>
+
+            <!-- Contenedor Timeline -->
+            <div class="relative border-l-2 border-gold-accent ml-4 md:ml-32 space-y-12">
+
+                <!-- Evento 1 -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <!-- Icono / Nodo -->
+                    <div class="absolute -left-4 top-0 wax-seal w-8 h-8 rounded-full flex items-center justify-center text-parchment text-xs border border-gold-accent group-hover:scale-125 transition">
+                        <i class="fas fa-comment-alt"></i>
+                    </div>
+                    <!-- Etiqueta de fecha -->
+                    <div class="md:absolute md:-left-36 md:top-0 text-left md:text-right md:w-28 font-heading font-bold text-burgundy text-lg">
+                        7 Diciembre
+                    </div>
+                    <!-- Tarjeta -->
+                    <div class="parchment-card p-6 rounded-lg border border-gold-accent/40 shadow-md hover:shadow-xl transition">
+                        <h3 class="font-heading text-2xl text-burgundy font-bold mb-2">El primer comentario</h3>
+                        <p class="font-serif text-lg text-espresso/90 leading-relaxed">
+                            Mi amor, tengo tantos recuerdos bonitos contigo, recuerdos que sé que nunca tendré con nadie más, porque cada momento a tu lado es único y especial para mí. Recuerdo nuestras conversaciones, nuestros primeros días hablando y, sobre todo, aquel día en el que dijiste: «Ojalá alguien me amara como vos amás a tu novia». Y sí, qué curioso es todo, ¿verdad? Porque esa persona que tanto deseabas que te amara de esa manera soy yo. La misma chica a la que le dijiste aquellas palabras, esa chica que hoy está completamente loca de amor por vos, que tiene tantos sueños e ilusiones a futuro a tu lado y que ahora tiene la dicha de llamarte su novia.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Evento 2 -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <div class="absolute -left-4 top-0 wax-seal w-8 h-8 rounded-full flex items-center justify-center text-parchment text-xs border border-gold-accent group-hover:scale-125 transition">
+                        <i class="fas fa-[#e0a96d] fa-heart"></i>
+                    </div>
+                    <div class="md:absolute md:-left-36 md:top-0 text-left md:text-right md:w-28 font-heading font-bold text-burgundy text-lg">
+                        3 de Mayo
+                    </div>
+                    <div class="parchment-card p-6 rounded-lg border border-gold-accent/40 shadow-md hover:shadow-xl transition">
+                        <h3 class="font-heading text-2xl text-burgundy font-bold mb-2">La declaración de amor</h3>
+                        <p class="font-serif text-lg text-espresso/90 leading-relaxed">
+                            El día en que reuní todo el valor del mundo para decirte todo lo que sentía. El instante en que la amistad dio paso a la hermosa posibilidad de un nosotros.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Evento 3 -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <div class="absolute -left-4 top-0 wax-seal w-8 h-8 rounded-full flex items-center justify-center text-parchment text-xs border border-gold-accent group-hover:scale-125 transition">
+                        <i class="fas fa-[#e0a96d] fa-envelope-open-text"></i>
+                    </div>
+                    <div class="md:absolute md:-left-36 md:top-0 text-left md:text-right md:w-28 font-heading font-bold text-burgundy text-lg">
+                        4 de Mayo
+                    </div>
+                    <div class="parchment-card p-6 rounded-lg border border-gold-accent/40 shadow-md hover:shadow-xl transition">
+                        <h3 class="font-heading text-2xl text-burgundy font-bold mb-2">Tu carta y el inicio del noviazgo</h3>
+                        <p class="font-serif text-lg text-espresso/90 leading-relaxed">
+                            Aquel inolvidable 4 de mayo en que leí tu carta. El momento mágico en el que por fin pude decir con todo el orgullo del mundo: «Ella ahora es mi novia».
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Evento 4 -->
+                <div class="relative pl-8 md:pl-12 group">
+                    <div class="absolute -left-4 top-0 wax-seal w-8 h-8 rounded-full flex items-center justify-center text-parchment text-xs border border-gold-accent group-hover:scale-125 transition">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="md:absolute md:-left-36 md:top-0 text-left md:text-right md:w-28 font-heading font-bold text-burgundy text-lg">
+                        Seis Meses
+                    </div>
+                    <div class="parchment-card p-6 rounded-lg border border-gold-accent/40 shadow-md hover:shadow-xl transition space-y-4">
+                        <h3 class="font-heading text-2xl text-burgundy font-bold">¡Seis meses juntas!</h3>
+                        <p class="font-serif text-lg text-espresso/90 leading-relaxed">
+                            Seis meses, mi amor. ¡Seis meses juntas! Los mejores seis meses de mi vida, sin ninguna duda. Amé cada día, cada conversación, cada momento y cada pequeña cosa que hemos compartido durante este tiempo. No voy a negar que al principio no imaginaba que llegaríamos tan lejos, no sabía cuánto podía llegar a significar alguien que conocí por casualidad, pero miranos ahora, amor. Después de tantas conversaciones, tantos momentos y tantos recuerdos, seguimos aquí, eligiéndonos y construyendo nuestra propia historia.
+                        </p>
+                        <p class="font-serif text-lg text-espresso/90 leading-relaxed">
+                            Quiero que esto sea apenas el comienzo de algo muchísimo más grande. Quiero celebrar muchos más meses con vos, cumplir años juntas, compartir sueños, alcanzar nuestras metas y, algún día, poder tenerte frente a mí y abrazarte sin tener que despedirme a través de una pantalla. Quiero vivir tantas cosas a tu lado que seis meses terminen siendo apenas una pequeña parte de toda nuestra historia.
+                        </p>
+                        <p class="font-serif text-lg text-espresso/90 leading-relaxed">
+                            Porque sos la mujer que quiero en mi vida, la chica que amo con todo mi corazón y con quien quiero compartir mi futuro. Sos vos, mi vida, y no cambiaría nuestra historia por ninguna otra. Me hace muchísima ilusión pensar en todo lo que todavía nos falta vivir, en todas las fechas que nos quedan por celebrar y en la posibilidad de que algún día pueda llamarte mi esposa.
+                        </p>
+                        <p class="font-serif text-lg text-burgundy italic font-semibold pt-2">
+                            Te amo muchísimo, mi amor. Gracias por estos seis meses tan bonitos, por llegar a mi vida y por convertirte en alguien tan importante para mí. Si pudiera volver a aquel primer día, volvería a responderte una y mil veces, porque entre tantas casualidades, qué bonito fue encontrarte a vos. Felices seis meses, mi futura esposa...
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: 6 RAZONES PARA AMARTE -->
+    <section id="razones" class="py-20 px-4 max-w-5xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="font-heading text-4xl md:text-5xl text-burgundy font-bold">6 Razones para Amarte ♡</h2>
+            <p class="font-serif italic text-xl text-espresso/80 mt-2">Solo una pequeña muestra de lo inmensa que eres para mí</p>
+            <div class="w-24 h-0.5 bg-gold-accent mx-auto mt-4"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Razón 1 -->
+            <div class="parchment-card p-6 rounded-lg vintage-border relative group hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute -top-4 -right-4 wax-seal w-12 h-12 rounded-full flex items-center justify-center font-heading font-bold text-parchment text-xl border border-gold-accent shadow-md">
+                    1
+                </div>
+                <div class="text-burgundy text-3xl mb-3"><i class="fas fa-smile-beam"></i></div>
+                <h3 class="font-heading text-xl font-bold text-burgundy mb-2">Por cómo me haces sentir</h3>
+                <p class="font-serif text-lg text-espresso/90">
+                    Porque contigo puedo experimentar una felicidad que no sabía que existía y porque, incluso en los días difíciles, tienes una forma especial de hacer que todo se sienta un poquito mejor.
+                </p>
+            </div>
+
+            <!-- Razón 2 -->
+            <div class="parchment-card p-6 rounded-lg vintage-border relative group hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute -top-4 -right-4 wax-seal w-12 h-12 rounded-full flex items-center justify-center font-heading font-bold text-parchment text-xl border border-gold-accent shadow-md">
+                    2
+                </div>
+                <div class="text-burgundy text-3xl mb-3"><i class="fas fa-laugh-squint"></i></div>
+                <h3 class="font-heading text-xl font-bold text-burgundy mb-2">Por tus risas en mis días malos</h3>
+                <p class="font-serif text-lg text-espresso/90">
+                    Por cómo logras hacerme reír incluso en mis días malos. Porque tienes esa capacidad tan bonita de sacarme una sonrisa cuando menos lo espero y hacer que mis días sean mucho más lindos.
+                </p>
+            </div>
+
+            <!-- Razón 3 -->
+            <div class="parchment-card p-6 rounded-lg vintage-border relative group hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute -top-4 -right-4 wax-seal w-12 h-12 rounded-full flex items-center justify-center font-heading font-bold text-parchment text-xl border border-gold-accent shadow-md">
+                    3
+                </div>
+                <div class="text-burgundy text-3xl mb-3"><i class="fas fa-magic"></i></div>
+                <h3 class="font-heading text-xl font-bold text-burgundy mb-2">Por tus locuras y tu ser</h3>
+                <p class="font-serif text-lg text-espresso/90">
+                    Por tus locuras y tu manera de ser. Por cada ocurrencia, cada tontería y por esa forma tan tuya de motivarme a crecer, mejorar y convertirme en una mejor persona.
+                </p>
+            </div>
+
+            <!-- Razón 4 -->
+            <div class="parchment-card p-6 rounded-lg vintage-border relative group hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute -top-4 -right-4 wax-seal w-12 h-12 rounded-full flex items-center justify-center font-heading font-bold text-parchment text-xl border border-gold-accent shadow-md">
+                    4
+                </div>
+                <div class="text-burgundy text-3xl mb-3"><i class="fas fa-sun"></i></div>
+                <h3 class="font-heading text-xl font-bold text-burgundy mb-2">Por tu hermosa sonrisa</h3>
+                <p class="font-serif text-lg text-espresso/90">
+                    Porque podría pasarme horas admirándola y porque verla es una de esas pequeñas cosas que siempre consiguen alegrarme el día.
+                </p>
+            </div>
+
+            <!-- Razón 5 -->
+            <div class="parchment-card p-6 rounded-lg vintage-border relative group hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute -top-4 -right-4 wax-seal w-12 h-12 rounded-full flex items-center justify-center font-heading font-bold text-parchment text-xl border border-gold-accent shadow-md">
+                    5
+                </div>
+                <div class="text-burgundy text-3xl mb-3"><i class="fas fa-gem"></i></div>
+                <h3 class="font-heading text-xl font-bold text-burgundy mb-2">Por tu ser maravilloso</h3>
+                <p class="font-serif text-lg text-espresso/90">
+                    Porque eres una de las personas más maravillosas que conozco. Por tu corazón, tu forma de pensar, tus cualidades y hasta esos pequeños detalles que te hacen ser tú. Admiro muchísimo la persona que eres.
+                </p>
+            </div>
+
+            <!-- Razón 6 -->
+            <div class="parchment-card p-6 rounded-lg vintage-border relative group hover:-translate-y-2 transition-all duration-300">
+                <div class="absolute -top-4 -right-4 wax-seal w-12 h-12 rounded-full flex items-center justify-center font-heading font-bold text-parchment text-xl border border-gold-accent shadow-md">
+                    6
+                </div>
+                <div class="text-burgundy text-3xl mb-3"><i class="fas fa-infinity"></i></div>
+                <h3 class="font-heading text-xl font-bold text-burgundy mb-2">Porque eres tú todo lo que quiero</h3>
+                <p class="font-serif text-lg text-espresso/90">
+                    Porque entre tantas personas, mi corazón te eligió a ti. Porque no necesito que seas perfecta, solamente quiero que sigas siendo tú, y porque no hay nadie con quien prefiera compartir mis días, mis sueños y mi futuro.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECCIÓN 4: LAS 6 CARTITAS -->
+    <section id="cartitas" class="py-20 px-4 bg-parchment-dark/60 border-y border-gold-accent/30">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-heading text-4xl md:text-5xl text-burgundy font-bold">Las 6 Cartitas</h2>
+                <p class="font-serif italic text-xl text-espresso/80 mt-2">Seis pequeños regalos para abrir cuando quieras</p>
+                <div class="w-24 h-0.5 bg-gold-accent mx-auto mt-4"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <!-- Carta 1 -->
+                <div onclick="openModal(1)" class="cursor-pointer group parchment-card p-6 rounded-lg border border-gold-accent/60 shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 text-center relative overflow-hidden">
+                    <div class="wax-seal w-14 h-14 rounded-full mx-auto flex items-center justify-center text-parchment font-bold text-xl border border-gold-accent mb-4 group-hover:scale-110 transition">
+                        1
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-burgundy">Para recordarte cuánto te amo</h3>
+                    <p class="text-xs text-espresso/60 italic mt-2">✦ Abrir cartita ✦</p>
+                </div>
+
+                <!-- Carta 2 -->
+                <div onclick="openModal(2)" class="cursor-pointer group parchment-card p-6 rounded-lg border border-gold-accent/60 shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 text-center relative overflow-hidden">
+                    <div class="wax-seal w-14 h-14 rounded-full mx-auto flex items-center justify-center text-parchment font-bold text-xl border border-gold-accent mb-4 group-hover:scale-110 transition">
+                        2
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-burgundy">Sobre lo mucho que me haces feliz</h3>
+                    <p class="text-xs text-espresso/60 italic mt-2">✦ Abrir cartita ✦</p>
+                </div>
+
+                <!-- Carta 3 -->
+                <div onclick="openModal(3)" class="cursor-pointer group parchment-card p-6 rounded-lg border border-gold-accent/60 shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 text-center relative overflow-hidden">
+                    <div class="wax-seal w-14 h-14 rounded-full mx-auto flex items-center justify-center text-parchment font-bold text-xl border border-gold-accent mb-4 group-hover:scale-110 transition">
+                        3
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-burgundy">Sobre nuestro futuro</h3>
+                    <p class="text-xs text-espresso/60 italic mt-2">✦ Abrir cartita ✦</p>
+                </div>
+
+                <!-- Carta 4 -->
+                <div onclick="openModal(4)" class="cursor-pointer group parchment-card p-6 rounded-lg border border-gold-accent/60 shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 text-center relative overflow-hidden">
+                    <div class="wax-seal w-14 h-14 rounded-full mx-auto flex items-center justify-center text-parchment font-bold text-xl border border-gold-accent mb-4 group-hover:scale-110 transition">
+                        4
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-burgundy">Para cuando me extrañes</h3>
+                    <p class="text-xs text-espresso/60 italic mt-2">✦ Abrir cartita ✦</p>
+                </div>
+
+                <!-- Carta 5 -->
+                <div onclick="openModal(5)" class="cursor-pointer group parchment-card p-6 rounded-lg border border-gold-accent/60 shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 text-center relative overflow-hidden">
+                    <div class="wax-seal w-14 h-14 rounded-full mx-auto flex items-center justify-center text-parchment font-bold text-xl border border-gold-accent mb-4 group-hover:scale-110 transition">
+                        5
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-burgundy">Sobre lo especial que eres</h3>
+                    <p class="text-xs text-espresso/60 italic mt-2">✦ Abrir cartita ✦</p>
+                </div>
+
+                <!-- Carta 6 -->
+                <div onclick="openModal(6)" class="cursor-pointer group parchment-card p-6 rounded-lg border border-gold-accent/60 shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 text-center relative overflow-hidden">
+                    <div class="wax-seal w-14 h-14 rounded-full mx-auto flex items-center justify-center text-parchment font-bold text-xl border border-gold-accent mb-4 group-hover:scale-110 transition">
+                        6
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-burgundy">Para cerrar los seis regalos</h3>
+                    <p class="text-xs text-espresso/60 italic mt-2">✦ Abrir cartita ✦</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 5: SORPRESA FINAL -->
+    <section id="sorpresa" class="py-24 px-4 max-w-4xl mx-auto text-center relative">
+        <div class="mb-12">
+            <h2 class="font-heading text-4xl md:text-5xl text-burgundy font-bold">Sorpresa Final</h2>
+            <p class="font-serif italic text-xl text-espresso/80 mt-2">Un mensaje especial para concluir esta celebración</p>
+            <div class="w-24 h-0.5 bg-gold-accent mx-auto mt-4"></div>
+        </div>
+
+        <div id="surprise-container" class="parchment-card p-8 md:p-12 rounded-lg vintage-border relative shadow-2xl space-y-6">
+            <div id="surprise-locked" class="py-8 space-y-6">
+                <div class="wax-seal w-24 h-24 rounded-full mx-auto flex items-center justify-center text-gold-accent text-4xl border-2 border-gold-accent shadow-2xl animate-bounce">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h3 class="font-heading text-2xl text-burgundy font-bold">¿Lista para ver la sorpresa?</h3>
+                <p class="font-serif text-lg text-espresso/80">Haz clic en el botón de abajo para revelar las últimas palabras de este regalo.</p>
+                <button onclick="revealSurprise()" class="bg-burgundy text-parchment font-heading text-lg px-8 py-3 rounded-full border-2 border-gold-accent hover:bg-burgundy-dark transition transform hover:scale-105 shadow-xl">
+                    Abrir la sorpresa final <i class="fas fa-sparkles ml-2 text-gold-accent"></i>
+                </button>
+            </div>
+
+            <div id="surprise-unlocked" class="hidden text-left space-y-6 animate-fadeIn">
+                <div class="text-center border-b border-gold-accent/40 pb-4">
+                    <span class="font-script text-4xl text-burgundy font-bold">Para mi futura esposa...</span>
+                </div>
+                <p class="font-serif text-lg md:text-xl text-espresso leading-relaxed">
+                    Bueno, amor, esto es solo el final de este pequeño detalle, pues será uno de muchos que todavía tengo preparados para ti. Felices 6 meses, mi vida. No sabes lo feliz que me hace poder celebrar otro mes a tu lado, seguir compartiendo momentos contigo y tener la oportunidad de demostrarte lo muchísimo que te amo.
+                </p>
+                <p class="font-serif text-lg md:text-xl text-espresso leading-relaxed">
+                    Espero que este sea apenas uno de tantos aniversarios que nos esperan, que sigamos acumulando recuerdos, cumpliendo sueños y encontrando nuevas razones para elegirnos cada día. Quiero seguir sorprendiéndote, escribiéndote, dedicándote palabras bonitas y recordándote lo especial que eres para mí.
+                </p>
+                <p class="font-serif text-lg md:text-xl text-espresso leading-relaxed">
+                    Gracias por estos seis meses tan bonitos, por llegar a mi vida y convertirte en alguien tan importante para mí. Si algo tengo claro es que quiero seguir construyendo muchísimas cosas contigo. Esto no termina aquí, mi amor, todavía tengo miles de detalles, cartas y sueños que compartir contigo.
+                </p>
+                <div class="text-center pt-6 border-t border-gold-accent/40">
+                    <p class="font-script text-4xl text-burgundy font-bold">Te amo muchísimo, cariño.</p>
+                    <p class="font-serif italic text-xl text-espresso font-semibold mt-2">Felices seis meses, mi niña. ♡</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER VINTAGE -->
+    <footer class="py-8 bg-burgundy-dark text-parchment text-center border-t-2 border-gold-accent">
+        <p class="font-script text-3xl mb-1">Mi vida</p>
+        <p class="font-serif text-xs tracking-widest text-gold-accent uppercase">Hecho con todo el amor del mundo • 6 Meses Juntas</p>
+    </footer>
+
+    <!-- MODAL DE CARTITAS -->
+    <div id="card-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="parchment-card max-w-xl w-full p-8 rounded-lg vintage-border relative shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-burgundy/10 text-burgundy hover:bg-burgundy hover:text-parchment transition flex items-center justify-center">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="text-center mb-6 border-b border-gold-accent/40 pb-4">
+                <span id="modal-number" class="font-script text-2xl text-gold-accent font-bold">Cartita #1</span>
+                <h3 id="modal-title" class="font-heading text-2xl text-burgundy font-bold mt-1">Título</h3>
+            </div>
+            <div id="modal-body" class="font-serif text-lg md:text-xl text-espresso leading-relaxed space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="mt-6 text-right border-t border-gold-accent/40 pt-4">
+                <span class="font-script text-2xl text-burgundy">Con todo mi amor</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* -------------------------------------------------------------
+           1. CARTA PRINCIPAL MOSTRAR/OCULTAR
+        ------------------------------------------------------------- */
+        function openMainLetter() {
+            document.getElementById('envelope-closed').classList.add('hidden');
+            const letter = document.getElementById('letter-open');
+            letter.classList.remove('hidden');
+            letter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function closeMainLetter() {
+            document.getElementById('letter-open').classList.add('hidden');
+            document.getElementById('envelope-closed').classList.remove('hidden');
+        }
+
+        /* -------------------------------------------------------------
+           2. DATOS Y MODAL DE LAS 6 CARTITAS
+        ------------------------------------------------------------- */
+        const cartitasData = {
+            1: {
+                title: "Una cartita para recordarte cuánto te amo",
+                body: "Mi amor, a veces siento que no existen suficientes palabras para explicarte lo mucho que te amo. Me gustas de una manera que no sé explicar, me encanta todo de ti y hasta las pequeñas cosas que quizás tú no notas se han vuelto especiales para mí. No sé cómo tuve tanta suerte de encontrarte, pero qué bonito es poder decir que eres mi novia. Si pudiera elegir otra vez, volvería a elegirte a ti, sin pensarlo."
+            },
+            2: {
+                title: "Una cartita sobre lo mucho que me haces feliz",
+                body: "No sabes lo feliz que me haces, amor. A veces puedo estar teniendo un día horrible y basta con hablar contigo para que todo se sienta un poquito mejor. Me encanta reírme contigo, contarte mis cosas, escuchar las tuyas y hacer cualquier tontería juntas. Quizás para ti sean momentos normales, pero yo les tengo muchísimo cariño. Me haces feliz de una forma muy bonita."
+            },
+            3: {
+                title: "Una cartita sobre nuestro futuro",
+                body: "Tengo tantos sueños en los que apareces tú. Me hace ilusión pensar en todas las cosas que todavía nos faltan por vivir, en los lugares que quiero conocer contigo, las fotos que quiero tomarnos y todos esos momentos que algún día podremos compartir sin una pantalla de por medio. No sé exactamente qué nos espera, pero sí sé que me encantaría seguir construyendo cosas bonitas a tu lado. Quiero que nos queden muchísimas historias por contar."
+            },
+            4: {
+                title: "Una cartita para cuando me extrañes",
+                body: "Si algún día me extrañas mucho, quiero que recuerdes que aquí hay una personita que piensa en ti más de lo que imaginas. Que quisiera poder aparecer de repente, darte un abrazo enorme y quedarme contigo un ratito. No siempre es fácil tenerte lejos, pero ni la distancia consigue hacer que te quiera menos. Ojalá llegue pronto el día en que ya no tengamos que conformarnos con imaginarnos esos abrazos."
+            },
+            5: {
+                title: "Una cartita sobre lo especial que eres",
+                body: "Amor, espero que nunca dudes de lo especial que eres para mí. Me encanta tu forma de ser, tus ocurrencias, tus pequeñas manías y todas esas cosas que te hacen ser tú. No necesito que seas perfecta, tampoco quiero que cambies nada para gustarme más. Me gustas siendo tú, incluso en esos días en los que no te sientes tan bien contigo misma. Quiero que siempre tengas presente lo mucho que vales y lo bonito que es tenerte en mi vida."
+            },
+            6: {
+                title: "Una cartita para cerrar los seis regalos",
+                body: "Y por último, mi niña, quiero darte las gracias. Gracias por estos seis meses, por haber llegado a mi vida y por permitirme compartir contigo esta parte de ella. Si me preguntaran qué ha sido de las cosas más bonitas que me han pasado últimamente, sin duda hablaría de ti. Me hace mucha ilusión celebrar nuestro primer medio año juntas y pensar que todavía nos quedan tantos meses, cumpleaños, aniversarios y recuerdos por crear. Te amo muchísimo, amor. Feliz seis meses, mi amor."
+            }
+        };
+
+        function openModal(id) {
+            const data = cartitasData[id];
+            document.getElementById('modal-number').innerText = `Cartita #${id}`;
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-body').innerText = data.body;
+
+            const modal = document.getElementById('card-modal');
+            const content = document.getElementById('modal-content');
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('card-modal');
+            const content = document.getElementById('modal-content');
+
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+        }
+
+        // Cerrar modal al pulsar fuera de él
+        document.getElementById('card-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        /* -------------------------------------------------------------
+           3. SORPRESA FINAL & EFECTOS DE CELEBRACIÓN
+        ------------------------------------------------------------- */
+        function revealSurprise() {
+            document.getElementById('surprise-locked').classList.add('hidden');
+            document.getElementById('surprise-unlocked').classList.remove('hidden');
+            createSparkles();
+        }
+
+        function createSparkles() {
+            // Lluvia adicional de corazones y brillitos al abrir la sorpresa
+            for(let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    particles.push(new Particle(true));
+                }, i * 40);
+            }
+        }
+
+        /* -------------------------------------------------------------
+           4. REPRODUCTOR DE MÚSICA CON AUDIO HTML5 (My One and Only Love)
+        ------------------------------------------------------------- */
+        const bgAudio = document.getElementById('bg-audio');
+        const musicToggleBtn = document.getElementById('music-toggle');
+        const vinylRecord = document.getElementById('vinyl-record');
+        const musicStatus = document.getElementById('music-status');
+        const musicIconHover = document.getElementById('music-icon-hover');
+        const audioFileInput = document.getElementById('audio-file-input');
+
+        function toggleMusic() {
+            if (bgAudio.paused) {
+                bgAudio.play().then(() => {
+                    vinylRecord.classList.remove('paused');
+                    musicStatus.innerText = 'Mon Laferte • Sonando ♡';
+                    musicIconHover.className = 'fas fa-pause';
+                }).catch(err => {
+                    musicStatus.innerText = 'Haz click o sube la canción';
+                });
+            } else {
+                bgAudio.pause();
+                vinylRecord.classList.add('paused');
+                musicStatus.innerText = 'Mon Laferte • Pausado';
+                musicIconHover.className = 'fas fa-play';
+            }
+        }
+
+        musicToggleBtn.addEventListener('click', toggleMusic);
+
+        // Permitir cargar archivo propio de canción si se desea
+        audioFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                bgAudio.src = fileURL;
+                bgAudio.play();
+                vinylRecord.classList.remove('paused');
+                musicStatus.innerText = file.name.substring(0, 20) + '...';
+                musicIconHover.className = 'fas fa-pause';
+            }
+        });
+
+        /* -------------------------------------------------------------
+           5. CANVAS DE CORAZONES ROJOS Y BRILLITOS
+        ------------------------------------------------------------- */
+        const canvas = document.getElementById('petals-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(isBurst = false) {
+                this.reset(isBurst);
+            }
+
+            reset(isBurst = false) {
+                this.x = Math.random() * canvas.width;
+                this.y = isBurst ? Math.random() * canvas.height : -20;
+                this.isHeart = Math.random() > 0.4; // 60% corazones, 40% brillitos
+                this.size = this.isHeart ? Math.random() * 12 + 10 : Math.random() * 4 + 2;
+                this.speedY = Math.random() * 1.5 + 0.8;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 1.5 - 0.75;
+                this.opacity = Math.random() * 0.7 + 0.3;
+                
+                // Color: Corazones rojo intenso (#DC2626, #B91C1C, #991B1B) | Brillitos (#FFD700, #FFFFFF)
+                if (this.isHeart) {
+                    const redShades = ['#DC2626', '#E11D48', '#B91C1C', '#991B1B'];
+                    this.color = redShades[Math.floor(Math.random() * redShades.length)];
+                } else {
+                    this.color = Math.random() > 0.5 ? '#FFD700' : '#FFFFFF';
+                }
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += Math.sin(this.y * 0.02) + this.speedX;
+                this.rotation += this.rotationSpeed;
+
+                if (this.y > canvas.height + 20) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate((this.rotation * Math.PI) / 180);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+
+                if (this.isHeart) {
+                    // Dibujar Corazón Rojo
+                    const s = this.size / 15;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.bezierCurveTo(-10 * s, -10 * s, -15 * s, 5 * s, 0, 15 * s);
+                    ctx.bezierCurveTo(15 * s, 5 * s, 10 * s, -10 * s, 0, 0);
+                    ctx.fill();
+                } else {
+                    // Dibujar Brillito (Estrella de 4 puntas)
+                    const r = this.size;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -r);
+                    ctx.quadraticCurveTo(0, 0, r, 0);
+                    ctx.quadraticCurveTo(0, 0, 0, r);
+                    ctx.quadraticCurveTo(0, 0, -r, 0);
+                    ctx.quadraticCurveTo(0, 0, 0, -r);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        const particles = Array.from({ length: 45 }, () => new Particle(true));
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.onload = function() {
+            animateParticles();
+        };
+    </script>
+</body>
+</html>
